@@ -26,10 +26,13 @@ export default function Nav() {
   }
 
   return (
-    <header className="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-slate-200">
+    <header className="sticky top-0 z-30 backdrop-blur-xl bg-slate-950/60 border-b border-white/10 shadow-[0_8px_24px_-12px_rgba(37,99,235,.45)]">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
-        <Link href="/" className="font-bold text-brand-dark text-lg">
-          Admin <span className="text-slate-400 font-normal">German</span>
+        <Link href="/" className="group flex items-center gap-2 font-extrabold text-lg tracking-tight">
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand via-brand-red to-brand-blue text-brand-ink font-black shadow-glow-yellow group-hover:animate-pulse-ring transition">
+            S
+          </span>
+          <span className="logo-shine">Administración Saladino</span>
         </Link>
         <nav className="flex-1 flex items-center gap-1 overflow-x-auto">
           {links.map((l) => {
@@ -38,10 +41,10 @@ export default function Nav() {
               <Link
                 key={l.href}
                 href={l.href}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition ${
+                className={`relative px-3 py-1.5 rounded-lg text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
                   active
-                    ? "bg-brand text-white"
-                    : "text-slate-600 hover:bg-slate-100"
+                    ? "text-brand-ink shadow-glow-yellow bg-gradient-to-r from-yellow-300 via-yellow-400 to-amber-500"
+                    : "text-slate-300 hover:text-white hover:bg-white/10"
                 }`}
               >
                 {l.label}
@@ -49,7 +52,10 @@ export default function Nav() {
             );
           })}
         </nav>
-        <button onClick={logout} className="text-sm text-slate-500 hover:text-red-600">
+        <button
+          onClick={logout}
+          className="text-sm font-semibold text-slate-300 hover:text-red-400 transition"
+        >
           Salir
         </button>
       </div>

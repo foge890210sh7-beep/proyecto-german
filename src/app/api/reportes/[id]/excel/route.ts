@@ -20,7 +20,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const rep: any = r.data;
 
   const wb = new ExcelJS.Workbook();
-  wb.creator = "Admin German";
+  wb.creator = "Administración Saladino";
   wb.created = new Date();
 
   // Hoja 1: Reporte
@@ -34,7 +34,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   ];
 
   ws.mergeCells("A1:E1");
-  ws.getCell("A1").value = "Reporte de trabajo — Admin German";
+  ws.getCell("A1").value = "Reporte de trabajo — Administración Saladino";
   ws.getCell("A1").font = { bold: true, size: 16, color: { argb: "FFB45309" } };
 
   ws.addRow([]);

@@ -91,7 +91,8 @@ export default function Calculator() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="fixed bottom-5 right-5 z-30 w-14 h-14 rounded-full bg-brand text-white text-2xl shadow-lg hover:bg-brand-dark transition flex items-center justify-center"
+        className="fixed bottom-5 right-5 z-30 w-14 h-14 rounded-full text-2xl shadow-glow-yellow flex items-center justify-center text-brand-ink animate-pulse-ring transition hover:scale-110"
+        style={{ backgroundImage: "linear-gradient(135deg, #fde047 0%, #facc15 50%, #ef4444 100%)" }}
         title="Calculadora"
       >
         🧮
@@ -100,15 +101,15 @@ export default function Calculator() {
       {open && (
         <div
           ref={ref}
-          className="fixed bottom-24 right-5 z-30 w-72 card shadow-xl"
+          className="fixed bottom-24 right-5 z-30 w-72 card animate-pop-in"
         >
           <div className="card-body p-3">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-xs text-slate-500">Calculadora</span>
-              <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-600 text-sm">✕</button>
+              <span className="text-xs uppercase tracking-widest text-slate-300 font-semibold">Calculadora</span>
+              <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-red-400 text-sm">✕</button>
             </div>
             <div
-              className="bg-slate-900 text-white text-right text-2xl font-mono px-3 py-3 rounded-lg mb-2 truncate cursor-pointer select-all"
+              className="bg-slate-950/80 border border-white/10 text-yellow-300 text-right text-2xl font-mono px-3 py-3 rounded-lg mb-2 truncate cursor-pointer select-all shadow-inner"
               onClick={copyResult}
               title="Click para copiar"
             >
@@ -156,10 +157,10 @@ function Btn({
   span?: 1 | 2;
 }) {
   const cls = {
-    num: "bg-slate-100 hover:bg-slate-200 text-slate-800",
-    op: "bg-amber-500 hover:bg-amber-600 text-white",
-    warn: "bg-slate-300 hover:bg-slate-400 text-slate-800",
-    eq: "bg-emerald-600 hover:bg-emerald-700 text-white",
+    num: "bg-white/10 hover:bg-white/20 text-white border border-white/10",
+    op: "bg-gradient-to-br from-yellow-300 to-amber-500 hover:brightness-110 text-brand-ink shadow-glow-yellow",
+    warn: "bg-gradient-to-br from-red-400 to-red-600 hover:brightness-110 text-white shadow-glow-red",
+    eq: "bg-gradient-to-br from-blue-400 to-blue-700 hover:brightness-110 text-white shadow-glow-blue",
   }[kind];
   return (
     <button
