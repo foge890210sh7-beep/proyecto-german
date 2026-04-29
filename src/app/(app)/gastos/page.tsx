@@ -3,10 +3,22 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Modal from "@/components/Modal";
+import Calculator from "@/components/Calculator";
 import { fmtMXN, fmtFecha, hoyISO } from "@/lib/format";
 import type { Gasto } from "@/lib/types";
 
-const CATEGORIAS = ["combustible", "materiales", "herramientas", "comida", "casetas", "mano de obra", "otros"];
+const CATEGORIAS = [
+  "combustible",
+  "agua",
+  "comida",
+  "materiales",
+  "cemento",
+  "arena",
+  "herramientas",
+  "casetas",
+  "mano de obra",
+  "otros",
+];
 
 export default function GastosPage() {
   const supabase = createClient();
@@ -187,6 +199,8 @@ export default function GastosPage() {
           </div>
         </Modal>
       )}
+
+      <Calculator />
     </div>
   );
 }

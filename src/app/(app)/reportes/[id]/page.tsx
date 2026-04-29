@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { fmtFecha, fmtMXN } from "@/lib/format";
 import DeleteReporteButton from "./DeleteReporteButton";
 import FotosManager from "./FotosManager";
+import Calculator from "@/components/Calculator";
 import type { Etapa, Foto } from "@/lib/types";
 
 const ETAPAS: { value: Etapa; label: string; color: string }[] = [
@@ -163,6 +164,8 @@ export default async function ReporteDetalle({ params }: { params: Promise<{ id:
           </div>
         </div>
       )}
+
+      <Calculator />
     </div>
   );
 }

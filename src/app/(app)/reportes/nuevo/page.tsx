@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { fmtMXN, fmtFecha, hoyISO } from "@/lib/format";
+import Calculator from "@/components/Calculator";
 import type { Cliente, Concepto, Etapa, Foto, PrecioCliente, Tramo } from "@/lib/types";
 
 type Linea = {
@@ -302,6 +303,7 @@ export default function NuevoReporte() {
             </button>
           </div>
         </div>
+        <Calculator />
       </div>
     );
   }
@@ -434,6 +436,8 @@ export default function NuevoReporte() {
           Continuar a fotos →
         </button>
       </div>
+
+      <Calculator />
     </div>
   );
 }
