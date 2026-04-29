@@ -75,3 +75,11 @@ export type Foto = {
   storage_path: string;
   created_at: string;
 };
+
+export type Presupuesto = {
+  id: string;
+  semana_inicio: string;
+  monto: number;
+  notas: string | null;
+  created_at: string;
+};
