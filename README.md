@@ -2,6 +2,10 @@
 
 Plataforma administrativa para German: control de reportes diarios de trabajo, gastos y fotos del campo, con cálculo automático de cobros por cliente/tramo y exportación a PDF y Excel.
 
+## 🚀 Deploy en 1 click (después de tener Supabase listo)
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ffoge890210sh7-beep%2Fproyecto-german&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY&envDescription=Pega%20la%20URL%20y%20la%20anon%20key%20de%20tu%20proyecto%20de%20Supabase&envLink=https%3A%2F%2Fsupabase.com%2Fdashboard%2Fproject%2F_%2Fsettings%2Fapi&project-name=admin-german&repository-name=admin-german)
+
 ## Funcionalidades
 
 - 📋 **Reporte diario de trabajo**: selecciona los conceptos del día (postes, señalamientos, etc.), captura cantidades y obtén el total a cobrar automáticamente.
