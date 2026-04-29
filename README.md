@@ -1,6 +1,6 @@
-# Plataforma Germán — Reparación de autopistas
+# Admin German — Reparación de autopistas
 
-Plataforma administrativa para Germán: control de reportes diarios de trabajo, gastos y fotos del campo, con cálculo automático de cobros por cliente/tramo y exportación a PDF y Excel.
+Plataforma administrativa para German: control de reportes diarios de trabajo, gastos y fotos del campo, con cálculo automático de cobros por cliente/tramo y exportación a PDF y Excel.
 
 ## Funcionalidades
 

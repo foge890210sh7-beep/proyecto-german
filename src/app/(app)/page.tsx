@@ -33,7 +33,7 @@ export default async function Dashboard() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Buenas tardes, Germán</h1>
+          <h1 className="text-2xl font-bold">Buenas tardes, German</h1>
           <p className="text-sm text-slate-500">Resumen del día — {fmtFecha(hoy)}</p>
         </div>
         <Link href="/reportes/nuevo" className="btn-primary">+ Nuevo reporte</Link>

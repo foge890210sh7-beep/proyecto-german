@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Plataforma Germán — Reparación de autopistas",
+  title: "Admin German — Reparación de autopistas",
   description: "Control administrativo: reportes diarios, gastos, fotos y cobros.",
 };
 

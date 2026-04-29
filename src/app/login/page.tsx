@@ -30,7 +30,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-100 px-4">
       <div className="w-full max-w-sm card">
         <div className="card-body">
-          <h1 className="text-xl font-bold text-brand-dark mb-1">Germán | Autopistas</h1>
+          <h1 className="text-xl font-bold text-brand-dark mb-1">Admin German</h1>
           <p className="text-sm text-slate-500 mb-6">Acceso privado</p>
           <form onSubmit={submit} className="space-y-4">
             <div>
