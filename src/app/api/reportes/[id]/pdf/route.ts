@@ -36,7 +36,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 
   // Header
   doc.fontSize(18).fillColor("#b45309").text("Reporte de trabajo", { align: "left" });
-  doc.fontSize(10).fillColor("#475569").text("Germán | Reparación de autopistas");
+  doc.fontSize(10).fillColor("#475569").text("Admin German — Reparación de autopistas");
   doc.moveDown();
 
   // Datos generales

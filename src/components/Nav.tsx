@@ -28,7 +28,7 @@ export default function Nav() {
     <header className="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-slate-200">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
         <Link href="/" className="font-bold text-brand-dark text-lg">
-          Germán <span className="text-slate-400 font-normal">| Autopistas</span>
+          Admin <span className="text-slate-400 font-normal">German</span>
         </Link>
         <nav className="flex-1 flex items-center gap-1 overflow-x-auto">
           {links.map((l) => {
