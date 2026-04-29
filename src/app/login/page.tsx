@@ -8,7 +8,6 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -17,11 +16,10 @@ export default function LoginPage() {
     setErr(null);
     setLoading(true);
     const supabase = createClient();
-    const fn = mode === "signin" ? supabase.auth.signInWithPassword : supabase.auth.signUp;
-    const { error } = await fn.call(supabase.auth, { email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
-      setErr(error.message);
+      setErr("Usuario o contraseña incorrectos.");
       return;
     }
     router.replace("/");
@@ -33,9 +31,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm card">
         <div className="card-body">
           <h1 className="text-xl font-bold text-brand-dark mb-1">Germán | Autopistas</h1>
-          <p className="text-sm text-slate-500 mb-6">
-            {mode === "signin" ? "Inicia sesión para continuar" : "Crear nueva cuenta"}
-          </p>
+          <p className="text-sm text-slate-500 mb-6">Acceso privado</p>
           <form onSubmit={submit} className="space-y-4">
             <div>
               <label className="label">Correo</label>
@@ -56,20 +52,17 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
+                autoComplete="current-password"
               />
             </div>
             {err && <p className="text-sm text-red-600">{err}</p>}
             <button type="submit" className="btn-primary w-full" disabled={loading}>
-              {loading ? "..." : mode === "signin" ? "Entrar" : "Crear cuenta"}
+              {loading ? "..." : "Entrar"}
             </button>
           </form>
-          <button
-            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-            className="mt-4 text-xs text-slate-500 hover:text-brand-dark w-full text-center"
-          >
-            {mode === "signin" ? "¿No tienes cuenta? Regístrate" : "¿Ya tienes cuenta? Inicia sesión"}
-          </button>
+          <p className="text-xs text-slate-400 text-center mt-6">
+            Sistema privado. El acceso lo crea el administrador.
+          </p>
         </div>
       </div>
     </div>

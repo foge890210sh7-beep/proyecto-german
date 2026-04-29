@@ -42,18 +42,24 @@ NEXT_PUBLIC_SUPABASE_URL=https://TU-PROYECTO.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=TU-ANON-KEY
 ```
 
-### 3. Instalar y correr en local
+### 3. Crear el usuario de Germán (única persona con acceso)
+
+La app **no permite registrarse desde la web**: solo puede entrar quien tenga una cuenta creada por el administrador. Pasos:
+
+1. En el dashboard de Supabase ve a **Authentication → Users → Add user → Create new user**.
+2. Captura el correo y contraseña que va a usar Germán y **marca la casilla "Auto Confirm User"**.
+3. (Opcional pero recomendado) Ve a **Authentication → Providers → Email** y desactiva **"Enable Email Signups"** para que nadie pueda crearse cuenta por su lado.
+
+### 4. Instalar y correr en local
 
 ```bash
 npm install
 npm run dev
 ```
 
-Abre http://localhost:3000 y crea tu cuenta (botón "Regístrate").
+Abre http://localhost:3000 e inicia sesión con el correo y contraseña que creaste en el paso anterior.
 
-> ⚠️ Si quieres bloquear el registro abierto, en el dashboard de Supabase ve a **Authentication → Providers → Email** y desactiva "Enable Email Signups" después de crear la cuenta de Germán.
-
-### 4. Datos iniciales
+### 5. Datos iniciales
 
 Una vez dentro, captura en este orden:
 
