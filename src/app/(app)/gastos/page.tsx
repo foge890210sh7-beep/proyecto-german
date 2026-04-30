@@ -63,7 +63,7 @@ export default function GastosPage() {
 
   // Editar/Borrar
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const menuRef = useRef<HTMLDivElement | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null!);
   const [editing, setEditing] = useState<Partial<Gasto> | null>(null);
 
   useEffect(() => {
@@ -451,7 +451,7 @@ function ItemGasto({
   onToggleMenu: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  menuRef: React.RefObject<HTMLDivElement | null>;
+  menuRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
     <li className="py-2.5 flex items-center justify-between gap-2 relative">
