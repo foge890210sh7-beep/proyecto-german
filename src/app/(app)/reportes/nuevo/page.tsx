@@ -406,15 +406,8 @@ export default function NuevoReporte() {
                         onChange={(e) => actualizar(i, { cantidad: Number(e.target.value) })}
                       />
                     </td>
-                    <td className="text-right">
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        className="input max-w-[140px] text-right ml-auto"
-                        value={l.precio_unitario}
-                        onChange={(e) => actualizar(i, { precio_unitario: Number(e.target.value) })}
-                      />
+                    <td className="text-right text-slate-300">
+                      {fmtMXN(l.precio_unitario)}
                     </td>
                     <td className="text-right font-medium">{fmtMXN(l.cantidad * l.precio_unitario)}</td>
                     <td className="text-right">

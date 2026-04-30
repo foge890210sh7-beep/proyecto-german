@@ -71,6 +71,17 @@ body {
     background-color: #0b1220;
     color: #f8fafc;
   }
+  /* Quita las flechitas de los inputs type=number (chrome/safari/firefox).
+     Se ven feas en móvil y no aportan: el user tipea o usa el teclado numérico. */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
   .label {
     @apply block text-xs font-semibold tracking-wide text-slate-300 mb-1.5 uppercase;
   }
