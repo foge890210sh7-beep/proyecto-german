@@ -380,48 +380,102 @@ export default function NuevoReporte() {
               Aún no hay partidas. Agrega conceptos desde la lista de arriba.
             </p>
           ) : (
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Concepto</th>
-                  <th>Unidad</th>
-                  <th className="text-right">Cantidad</th>
-                  <th className="text-right">P. unitario</th>
-                  <th className="text-right">Importe</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
+            <>
+              {/* === MOBILE: cards === */}
+              <ul className="md:hidden space-y-3">
                 {lineas.map((l, i) => (
-                  <tr key={l.concepto_id}>
-                    <td>{l.descripcion}</td>
-                    <td className="text-slate-500">{l.unidad}</td>
-                    <td className="text-right">
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        className="input max-w-[120px] text-right ml-auto"
-                        value={l.cantidad}
-                        onChange={(e) => actualizar(i, { cantidad: Number(e.target.value) })}
-                      />
-                    </td>
-                    <td className="text-right text-slate-300">
-                      {fmtMXN(l.precio_unitario)}
-                    </td>
-                    <td className="text-right font-medium">{fmtMXN(l.cantidad * l.precio_unitario)}</td>
-                    <td className="text-right">
-                      <button onClick={() => quitar(i)} className="text-red-600 text-sm hover:underline">Quitar</button>
-                    </td>
-                  </tr>
+                  <li key={l.concepto_id} className="rounded-xl border border-white/10 bg-white/5 p-3 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-slate-100">{l.descripcion}</p>
+                        <p className="text-xs text-slate-400">
+                          {fmtMXN(l.precio_unitario)} / {l.unidad}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => quitar(i)}
+                        aria-label="Quitar"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md text-red-400 hover:bg-red-500/10 transition shrink-0"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="18" y1="6" x2="6" y2="18" />
+                          <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 items-end">
+                      <div>
+                        <label className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Cantidad ({l.unidad})</label>
+                        <input
+                          type="number"
+                          inputMode="decimal"
+                          step="0.01"
+                          min="0"
+                          className="input mt-1 text-lg font-semibold"
+                          value={l.cantidad === 0 ? "" : l.cantidad}
+                          onFocus={(e) => e.target.select()}
+                          onChange={(e) => actualizar(i, { cantidad: e.target.value === "" ? 0 : Number(e.target.value) })}
+                        />
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Importe</p>
+                        <p className="text-lg font-bold text-yellow-300 mt-1">{fmtMXN(l.cantidad * l.precio_unitario)}</p>
+                      </div>
+                    </div>
+                  </li>
                 ))}
-                <tr className="bg-amber-50">
-                  <td colSpan={4} className="text-right font-semibold">Total a cobrar</td>
-                  <td className="text-right font-bold text-lg text-emerald-700">{fmtMXN(total)}</td>
-                  <td></td>
-                </tr>
-              </tbody>
-            </table>
+                <li className="rounded-xl border border-yellow-300/30 bg-yellow-300/5 p-3 flex items-center justify-between">
+                  <span className="font-semibold text-slate-200">Total a cobrar</span>
+                  <span className="text-xl font-bold text-emerald-300">{fmtMXN(total)}</span>
+                </li>
+              </ul>
+
+              {/* === DESKTOP: tabla === */}
+              <table className="table hidden md:table">
+                <thead>
+                  <tr>
+                    <th>Concepto</th>
+                    <th>Unidad</th>
+                    <th className="text-right">Cantidad</th>
+                    <th className="text-right">P. unitario</th>
+                    <th className="text-right">Importe</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {lineas.map((l, i) => (
+                    <tr key={l.concepto_id}>
+                      <td>{l.descripcion}</td>
+                      <td className="text-slate-500">{l.unidad}</td>
+                      <td className="text-right">
+                        <input
+                          type="number"
+                          inputMode="decimal"
+                          step="0.01"
+                          min="0"
+                          className="input max-w-[120px] text-right ml-auto"
+                          value={l.cantidad === 0 ? "" : l.cantidad}
+                          onFocus={(e) => e.target.select()}
+                          onChange={(e) => actualizar(i, { cantidad: e.target.value === "" ? 0 : Number(e.target.value) })}
+                        />
+                      </td>
+                      <td className="text-right text-slate-300">
+                        {fmtMXN(l.precio_unitario)}
+                      </td>
+                      <td className="text-right font-medium">{fmtMXN(l.cantidad * l.precio_unitario)}</td>
+                      <td className="text-right">
+                        <button onClick={() => quitar(i)} className="text-red-400 text-sm hover:underline">Quitar</button>
+                      </td>
+                    </tr>
+                  ))}
+                  <tr className="bg-yellow-300/5">
+                    <td colSpan={4} className="text-right font-semibold">Total a cobrar</td>
+                    <td className="text-right font-bold text-lg text-emerald-300">{fmtMXN(total)}</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+            </>
           )}
         </div>
       </div>
