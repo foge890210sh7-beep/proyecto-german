@@ -14,10 +14,10 @@
     "@supabase/supabase-js": "^2.45.4",
     "exceljs": "^4.4.0",
     "iconv-lite": "^0.6.3",
-    "next": "15.0.3",
+    "next": "^15.5.15",
     "pdfkit": "^0.15.1",
-    "react": "19.0.0-rc-66855b96-20241106",
-    "react-dom": "19.0.0-rc-66855b96-20241106"
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",
