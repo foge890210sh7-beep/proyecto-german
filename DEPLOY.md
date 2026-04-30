@@ -7,7 +7,7 @@
 ## ① Crear proyecto en Supabase (5 min)
 
 1. Entra a https://supabase.com/dashboard → **New project**
-2. Nombre: `admin-german` · Región: **East US (North Virginia)** · Password: invéntate uno largo y guárdalo
+2. Nombre: `administracion-saladino` · Región: **East US (North Virginia)** · Password: invéntate uno largo y guárdalo
 3. Espera ~2 min a que termine de crearse.
 
 ### Cargar la base de datos
@@ -36,7 +36,7 @@
 
 ## ② Deploy a Vercel (3 min)
 
-12. Click en este botón: **[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ffoge890210sh7-beep%2Fproyecto-german&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY&envDescription=Pega%20la%20URL%20y%20la%20anon%20key%20de%20tu%20proyecto%20de%20Supabase&envLink=https%3A%2F%2Fsupabase.com%2Fdashboard%2Fproject%2F_%2Fsettings%2Fapi&project-name=admin-german&repository-name=admin-german)**
+12. Click en este botón: **[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ffoge890210sh7-beep%2Fproyecto-german&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY&envDescription=Pega%20la%20URL%20y%20la%20anon%20key%20de%20tu%20proyecto%20de%20Supabase&envLink=https%3A%2F%2Fsupabase.com%2Fdashboard%2Fproject%2F_%2Fsettings%2Fapi&project-name=administracion-saladino&repository-name=administracion-saladino)**
 
 13. Login con GitHub si te pide.
 14. Te aparecerán 2 campos para llenar:
@@ -48,7 +48,7 @@
 
 ## ③ Probar (2 min)
 
-16. Vercel te da una URL tipo `admin-german.vercel.app` o similar.
+16. Vercel te da una URL tipo `administracion-saladino.vercel.app` o similar.
 17. Abre en celular o compu, inicia sesión con el correo/contraseña que creaste para Germán.
 18. Ya debe mostrar los 16 conceptos en `/conceptos` y 3 clientes en `/clientes`.
 
