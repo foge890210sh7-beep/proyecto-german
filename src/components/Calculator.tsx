@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 
 type Op = "+" | "-" | "*" | "/" | null;
+type Pos = { x: number; y: number };
+
+const STORAGE_KEY = "saladino_calc_pos_v1";
 
 export default function Calculator() {
   const [open, setOpen] = useState(false);
@@ -10,11 +13,38 @@ export default function Calculator() {
   const [prev, setPrev] = useState<number | null>(null);
   const [op, setOp] = useState<Op>(null);
   const [waiting, setWaiting] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+
+  // Posición arrastrable. Por default va abajo a la derecha (offset 0,0 desde su sitio inicial).
+  const [pos, setPos] = useState<Pos>({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const dragOrigin = useRef<{ startX: number; startY: number; baseX: number; baseY: number } | null>(null);
+
+  // Carga la última posición guardada
+  useEffect(() => {
+    try {
+      const saved = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
+      if (saved) {
+        const p = JSON.parse(saved);
+        if (typeof p?.x === "number" && typeof p?.y === "number") setPos(p);
+      }
+    } catch {}
+  }, []);
+
+  // Guarda la posición cuando cambia
+  useEffect(() => {
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(pos));
+      }
+    } catch {}
+  }, [pos]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (!open) return;
+      const tag = (e.target as HTMLElement | null)?.tagName?.toLowerCase();
+      // Si el foco está en un input/textarea de la app, no captures las teclas
+      if (tag === "input" || tag === "textarea" || tag === "select") return;
       if (/[0-9]/.test(e.key)) inputDigit(e.key);
       else if (e.key === ".") inputDot();
       else if (["+", "-", "*", "/"].includes(e.key)) inputOp(e.key as Op);
@@ -86,6 +116,56 @@ export default function Calculator() {
     navigator.clipboard?.writeText(display);
   }
 
+  // === Drag handlers ===
+  function onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    dragOrigin.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      baseX: pos.x,
+      baseY: pos.y,
+    };
+    setDragging(true);
+    (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
+  }
+  function onPointerMove(e: React.PointerEvent<HTMLDivElement>) {
+    const o = dragOrigin.current;
+    if (!o) return;
+    const dx = e.clientX - o.startX;
+    const dy = e.clientY - o.startY;
+    setPos({ x: o.baseX + dx, y: o.baseY + dy });
+  }
+  function onPointerUp(e: React.PointerEvent<HTMLDivElement>) {
+    dragOrigin.current = null;
+    setDragging(false);
+    try {
+      (e.currentTarget as HTMLDivElement).releasePointerCapture(e.pointerId);
+    } catch {}
+    // Snap dentro del viewport por si quedó fuera
+    if (typeof window !== "undefined") {
+      const margin = 8;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      // La caja se posiciona con bottom: 96, right: 20, width 288 (w-72)
+      // Con transform translate(x, y): x positivo la mueve a la derecha, y positivo abajo
+      // Para que no salga: el rect actual debe quedar dentro [0, w] x [0, h]
+      requestAnimationFrame(() => {
+        const el = e.currentTarget?.parentElement; // el contenedor con position fixed
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        let nx = pos.x;
+        let ny = pos.y;
+        if (r.left < margin) nx += margin - r.left;
+        if (r.top < margin) ny += margin - r.top;
+        if (r.right > w - margin) nx -= r.right - (w - margin);
+        if (r.bottom > h - margin) ny -= r.bottom - (h - margin);
+        if (nx !== pos.x || ny !== pos.y) setPos({ x: nx, y: ny });
+      });
+    }
+  }
+  function resetPos() {
+    setPos({ x: 0, y: 0 });
+  }
+
   return (
     <>
       <button
@@ -100,14 +180,42 @@ export default function Calculator() {
 
       {open && (
         <div
-          ref={ref}
-          className="fixed bottom-24 right-5 z-30 w-72 rounded-2xl border border-white/15 bg-slate-950 shadow-2xl ring-1 ring-yellow-300/20 animate-pop-in"
+          className={`fixed bottom-24 right-5 z-30 w-72 rounded-2xl border border-white/15 bg-slate-950 shadow-2xl ring-1 ring-yellow-300/20 ${dragging ? "" : "animate-pop-in transition-transform"}`}
+          style={{ transform: `translate(${pos.x}px, ${pos.y}px)` }}
         >
-          <div className="p-3">
-            <div className="flex justify-between items-center mb-2">
+          {/* Drag handle (header) */}
+          <div
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
+            onDoubleClick={resetPos}
+            className={`flex justify-between items-center px-3 pt-3 pb-2 select-none ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
+            style={{ touchAction: "none" }}
+            title="Arrástrame · doble click para resetear"
+          >
+            <div className="flex items-center gap-2 pointer-events-none">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400">
+                <circle cx="9" cy="6" r="1" />
+                <circle cx="15" cy="6" r="1" />
+                <circle cx="9" cy="12" r="1" />
+                <circle cx="15" cy="12" r="1" />
+                <circle cx="9" cy="18" r="1" />
+                <circle cx="15" cy="18" r="1" />
+              </svg>
               <span className="text-xs uppercase tracking-widest text-slate-200 font-semibold">Calculadora</span>
-              <button onClick={() => setOpen(false)} className="text-slate-300 hover:text-red-400 text-sm">✕</button>
             </div>
+            <button
+              onClick={(e) => { e.stopPropagation(); setOpen(false); }}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="text-slate-300 hover:text-red-400 text-sm px-2"
+              aria-label="Cerrar"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="px-3 pb-3">
             <div
               className="bg-black border border-yellow-300/30 text-yellow-300 text-right text-3xl font-mono font-bold px-3 py-4 rounded-lg mb-3 truncate cursor-pointer select-all shadow-inner"
               onClick={copyResult}
@@ -136,7 +244,7 @@ export default function Calculator() {
               <Btn onClick={equals} kind="eq">=</Btn>
             </div>
             <p className="text-[10px] text-slate-300 mt-2 text-center">
-              Tip: usa el teclado · Enter para = · Esc para AC
+              Arrastra desde la barra de arriba · doble tap = resetear
             </p>
           </div>
         </div>
