@@ -53,7 +53,19 @@ export default function NuevoReporte() {
         supabase.from("conceptos").select("*").eq("activo", true).order("descripcion"),
       ]);
       setClientes((c.data as Cliente[]) ?? []);
-      setConceptos((cs.data as Concepto[]) ?? []);
+      const conceptosArr = (cs.data as Concepto[]) ?? [];
+      setConceptos(conceptosArr);
+      // Inicializar la hoja con TODOS los conceptos en cantidad 0
+      // (Germán solo escribe la cantidad de los que hizo; los demás no se cobran)
+      setLineas(
+        conceptosArr.map((c) => ({
+          concepto_id: c.id,
+          descripcion: c.descripcion,
+          unidad: c.unidad,
+          cantidad: 0,
+          precio_unitario: Number(c.precio_base),
+        })),
+      );
     })();
   }, []);
 
@@ -82,22 +94,8 @@ export default function NuevoReporte() {
     })();
   }, [clienteId]);
 
-  function precioPara(c: Concepto): number {
-    return preciosCliente[c.id] ?? Number(c.precio_base);
-  }
-
-  function agregar(c: Concepto) {
-    if (lineas.find((l) => l.concepto_id === c.id)) return;
-    setLineas([
-      ...lineas,
-      { concepto_id: c.id, descripcion: c.descripcion, unidad: c.unidad, cantidad: 1, precio_unitario: precioPara(c) },
-    ]);
-  }
   function actualizar(i: number, patch: Partial<Linea>) {
     setLineas(lineas.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
-  }
-  function quitar(i: number) {
-    setLineas(lineas.filter((_, idx) => idx !== i));
   }
 
   const total = useMemo(
@@ -127,7 +125,8 @@ export default function NuevoReporte() {
 
   async function avanzarPaso() {
     if (!clienteId) return alert("Selecciona un cliente.");
-    if (lineas.length === 0) return alert("Agrega al menos un concepto al reporte.");
+    const conCantidad = lineas.filter((l) => Number(l.cantidad) > 0);
+    if (conCantidad.length === 0) return alert("Pon la cantidad de al menos un daño antes de continuar.");
     setPaso(2);
     cargarFotos();
   }
@@ -164,14 +163,17 @@ export default function NuevoReporte() {
       alert("Error: " + error?.message);
       return;
     }
-    const items = lineas.map((l) => ({
-      reporte_id: r.id,
-      concepto_id: l.concepto_id,
-      descripcion: l.descripcion,
-      unidad: l.unidad,
-      cantidad: Number(l.cantidad),
-      precio_unitario: Number(l.precio_unitario),
-    }));
+    // Solo guardamos los daños donde Germán puso una cantidad > 0
+    const items = lineas
+      .filter((l) => Number(l.cantidad) > 0)
+      .map((l) => ({
+        reporte_id: r.id,
+        concepto_id: l.concepto_id,
+        descripcion: l.descripcion,
+        unidad: l.unidad,
+        cantidad: Number(l.cantidad),
+        precio_unitario: Number(l.precio_unitario),
+      }));
     const { error: e2 } = await supabase.from("reporte_items").insert(items);
     if (e2) {
       setSaving(false);
@@ -194,8 +196,6 @@ export default function NuevoReporte() {
     setSaving(false);
     router.push(`/reportes/${r.id}`);
   }
-
-  const conceptosDisponibles = conceptos.filter((c) => !lineas.find((l) => l.concepto_id === c.id));
 
   if (paso === 2) {
     return (
@@ -343,141 +343,119 @@ export default function NuevoReporte() {
         </div>
       </div>
 
-      <div className="card">
-        <div className="card-body">
-          <h3 className="font-semibold mb-3">Agregar concepto</h3>
-          <p className="text-xs text-slate-400 mb-3">
-            Da click al concepto que hiciste hoy. Después abajo le pones la cantidad.
-          </p>
-          {conceptos.length === 0 ? (
-            <p className="text-sm text-slate-500">No hay conceptos en el catálogo.</p>
-          ) : conceptosDisponibles.length === 0 ? (
-            <p className="text-sm text-slate-500">Ya agregaste todos los conceptos disponibles.</p>
-          ) : (
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
-              {conceptosDisponibles.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => agregar(c)}
-                  className="text-left border border-slate-200 hover:border-brand hover:bg-amber-50 rounded-lg p-3 transition"
-                >
-                  <p className="font-medium text-sm">{c.descripcion}</p>
-                  <p className="text-xs text-slate-500 mt-1">
-                    {fmtMXN(precioPara(c))} / {c.unidad}
-                  </p>
-                </button>
-              ))}
-            </div>
-          )}
+      {/* === HOJA BLANCA estilo factura/Excel === */}
+      <div className="rounded-xl bg-white text-slate-900 shadow-2xl ring-1 ring-slate-300 overflow-hidden">
+        <div className="px-5 py-3 border-b border-slate-300 bg-slate-100 flex items-center justify-between">
+          <div>
+            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Hoja del día</p>
+            <p className="text-sm font-semibold capitalize">{fmtFecha(fecha)}</p>
+          </div>
+          <p className="text-xs text-slate-500">Pon la cantidad de cada daño que se reparó.</p>
         </div>
-      </div>
 
-      <div className="card">
-        <div className="card-body">
-          <h2 className="font-semibold mb-3">Trabajos realizados</h2>
-          {lineas.length === 0 ? (
-            <p className="text-sm text-slate-500 text-center py-6">
-              Aún no hay partidas. Agrega conceptos desde la lista de arriba.
-            </p>
-          ) : (
-            <>
-              {/* === MOBILE: cards === */}
-              <ul className="md:hidden space-y-3">
-                {lineas.map((l, i) => (
-                  <li key={l.concepto_id} className="rounded-xl border border-white/10 bg-white/5 p-3 space-y-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-slate-100">{l.descripcion}</p>
-                        <p className="text-xs text-slate-400">
+        {conceptos.length === 0 ? (
+          <p className="p-8 text-center text-sm text-slate-500">No hay conceptos en el catálogo.</p>
+        ) : (
+          <>
+            {/* === DESKTOP: tabla blanca === */}
+            <table className="hidden md:table w-full text-sm">
+              <thead>
+                <tr className="bg-slate-200 text-slate-700">
+                  <th className="text-left px-4 py-2.5 font-bold uppercase tracking-wider text-[11px]">Daño</th>
+                  <th className="text-center px-3 py-2.5 font-bold uppercase tracking-wider text-[11px]">Cantidad</th>
+                  <th className="text-right px-4 py-2.5 font-bold uppercase tracking-wider text-[11px]">Importe</th>
+                </tr>
+              </thead>
+              <tbody>
+                {lineas.map((l, i) => {
+                  const importe = Number(l.cantidad) * Number(l.precio_unitario);
+                  const activa = Number(l.cantidad) > 0;
+                  return (
+                    <tr key={l.concepto_id} className={`border-t border-slate-200 ${activa ? "bg-yellow-50" : ""}`}>
+                      <td className="px-4 py-2.5 align-middle">
+                        <p className={`font-medium ${activa ? "text-slate-900" : "text-slate-700"}`}>{l.descripcion}</p>
+                        <p className="text-xs text-slate-500">
                           {fmtMXN(l.precio_unitario)} / {l.unidad}
                         </p>
-                      </div>
-                      <button
-                        onClick={() => quitar(i)}
-                        aria-label="Quitar"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-md text-red-400 hover:bg-red-500/10 transition shrink-0"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                          <line x1="18" y1="6" x2="6" y2="18" />
-                          <line x1="6" y1="6" x2="18" y2="18" />
-                        </svg>
-                      </button>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 items-end">
-                      <div>
-                        <label className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Cantidad ({l.unidad})</label>
+                      </td>
+                      <td className="px-3 py-2.5 align-middle text-center">
                         <input
                           type="number"
                           inputMode="decimal"
                           step="0.01"
                           min="0"
-                          className="input mt-1 text-lg font-semibold"
+                          placeholder="0"
+                          className="w-24 mx-auto rounded-md border border-slate-300 bg-white px-2 py-1.5 text-center text-base font-semibold text-slate-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                          value={l.cantidad === 0 ? "" : l.cantidad}
+                          onFocus={(e) => e.target.select()}
+                          onChange={(e) => actualizar(i, { cantidad: e.target.value === "" ? 0 : Number(e.target.value) })}
+                        />
+                      </td>
+                      <td className={`px-4 py-2.5 align-middle text-right font-semibold ${activa ? "text-emerald-700" : "text-slate-300"}`}>
+                        {activa ? fmtMXN(importe) : "—"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr className="bg-slate-900 text-white">
+                  <td colSpan={2} className="px-4 py-3 text-right font-bold uppercase tracking-wider text-xs">Total a cobrar</td>
+                  <td className="px-4 py-3 text-right font-black text-xl text-yellow-300">{fmtMXN(total)}</td>
+                </tr>
+              </tfoot>
+            </table>
+
+            {/* === MOBILE: cards estilo hoja blanca === */}
+            <ul className="md:hidden divide-y divide-slate-200">
+              {lineas.map((l, i) => {
+                const importe = Number(l.cantidad) * Number(l.precio_unitario);
+                const activa = Number(l.cantidad) > 0;
+                return (
+                  <li key={l.concepto_id} className={`px-4 py-3 ${activa ? "bg-yellow-50" : ""}`}>
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-[10px] uppercase tracking-widest font-bold ${activa ? "text-amber-700" : "text-slate-400"}`}>Daño</p>
+                        <p className={`font-semibold leading-tight ${activa ? "text-slate-900" : "text-slate-700"}`}>{l.descripcion}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {fmtMXN(l.precio_unitario)} / {l.unidad}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 items-end">
+                      <div>
+                        <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Cantidad</p>
+                        <input
+                          type="number"
+                          inputMode="decimal"
+                          step="0.01"
+                          min="0"
+                          placeholder="0"
+                          className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-lg font-semibold text-slate-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-300"
                           value={l.cantidad === 0 ? "" : l.cantidad}
                           onFocus={(e) => e.target.select()}
                           onChange={(e) => actualizar(i, { cantidad: e.target.value === "" ? 0 : Number(e.target.value) })}
                         />
                       </div>
                       <div className="text-right">
-                        <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Importe</p>
-                        <p className="text-lg font-bold text-yellow-300 mt-1">{fmtMXN(l.cantidad * l.precio_unitario)}</p>
+                        <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Importe</p>
+                        <p className={`text-lg font-bold ${activa ? "text-emerald-700" : "text-slate-300"}`}>
+                          {activa ? fmtMXN(importe) : "—"}
+                        </p>
                       </div>
                     </div>
                   </li>
-                ))}
-                <li className="rounded-xl border border-yellow-300/30 bg-yellow-300/5 p-3 flex items-center justify-between">
-                  <span className="font-semibold text-slate-200">Total a cobrar</span>
-                  <span className="text-xl font-bold text-emerald-300">{fmtMXN(total)}</span>
-                </li>
-              </ul>
+                );
+              })}
+            </ul>
 
-              {/* === DESKTOP: tabla === */}
-              <table className="table hidden md:table">
-                <thead>
-                  <tr>
-                    <th>Concepto</th>
-                    <th>Unidad</th>
-                    <th className="text-right">Cantidad</th>
-                    <th className="text-right">P. unitario</th>
-                    <th className="text-right">Importe</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {lineas.map((l, i) => (
-                    <tr key={l.concepto_id}>
-                      <td>{l.descripcion}</td>
-                      <td className="text-slate-500">{l.unidad}</td>
-                      <td className="text-right">
-                        <input
-                          type="number"
-                          inputMode="decimal"
-                          step="0.01"
-                          min="0"
-                          className="input max-w-[120px] text-right ml-auto"
-                          value={l.cantidad === 0 ? "" : l.cantidad}
-                          onFocus={(e) => e.target.select()}
-                          onChange={(e) => actualizar(i, { cantidad: e.target.value === "" ? 0 : Number(e.target.value) })}
-                        />
-                      </td>
-                      <td className="text-right text-slate-300">
-                        {fmtMXN(l.precio_unitario)}
-                      </td>
-                      <td className="text-right font-medium">{fmtMXN(l.cantidad * l.precio_unitario)}</td>
-                      <td className="text-right">
-                        <button onClick={() => quitar(i)} className="text-red-400 text-sm hover:underline">Quitar</button>
-                      </td>
-                    </tr>
-                  ))}
-                  <tr className="bg-yellow-300/5">
-                    <td colSpan={4} className="text-right font-semibold">Total a cobrar</td>
-                    <td className="text-right font-bold text-lg text-emerald-300">{fmtMXN(total)}</td>
-                    <td></td>
-                  </tr>
-                </tbody>
-              </table>
-            </>
-          )}
-        </div>
+            {/* Total mobile */}
+            <div className="md:hidden bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
+              <span className="text-xs uppercase tracking-widest font-bold">Total a cobrar</span>
+              <span className="text-xl font-black text-yellow-300">{fmtMXN(total)}</span>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="flex justify-between items-center">
