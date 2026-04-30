@@ -345,10 +345,39 @@ export default function NuevoReporte() {
 
       <div className="card">
         <div className="card-body">
+          <h3 className="font-semibold mb-3">Agregar concepto</h3>
+          <p className="text-xs text-slate-400 mb-3">
+            Da click al concepto que hiciste hoy. Después abajo le pones la cantidad.
+          </p>
+          {conceptos.length === 0 ? (
+            <p className="text-sm text-slate-500">No hay conceptos en el catálogo.</p>
+          ) : conceptosDisponibles.length === 0 ? (
+            <p className="text-sm text-slate-500">Ya agregaste todos los conceptos disponibles.</p>
+          ) : (
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
+              {conceptosDisponibles.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => agregar(c)}
+                  className="text-left border border-slate-200 hover:border-brand hover:bg-amber-50 rounded-lg p-3 transition"
+                >
+                  <p className="font-medium text-sm">{c.descripcion}</p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {fmtMXN(precioPara(c))} / {c.unidad}
+                  </p>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-body">
           <h2 className="font-semibold mb-3">Trabajos realizados</h2>
           {lineas.length === 0 ? (
             <p className="text-sm text-slate-500 text-center py-6">
-              Aún no hay partidas. Agrega conceptos desde la lista de abajo.
+              Aún no hay partidas. Agrega conceptos desde la lista de arriba.
             </p>
           ) : (
             <table className="table">
@@ -400,32 +429,6 @@ export default function NuevoReporte() {
                 </tr>
               </tbody>
             </table>
-          )}
-        </div>
-      </div>
-
-      <div className="card">
-        <div className="card-body">
-          <h3 className="font-semibold mb-3">Agregar concepto</h3>
-          {conceptos.length === 0 ? (
-            <p className="text-sm text-slate-500">No hay conceptos en el catálogo.</p>
-          ) : conceptosDisponibles.length === 0 ? (
-            <p className="text-sm text-slate-500">Ya agregaste todos los conceptos disponibles.</p>
-          ) : (
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
-              {conceptosDisponibles.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => agregar(c)}
-                  className="text-left border border-slate-200 hover:border-brand hover:bg-amber-50 rounded-lg p-3 transition"
-                >
-                  <p className="font-medium text-sm">{c.descripcion}</p>
-                  <p className="text-xs text-slate-500 mt-1">
-                    {fmtMXN(precioPara(c))} / {c.unidad}
-                  </p>
-                </button>
-              ))}
-            </div>
           )}
         </div>
       </div>
