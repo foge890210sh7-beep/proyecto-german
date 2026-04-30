@@ -101,15 +101,15 @@ export default function Calculator() {
       {open && (
         <div
           ref={ref}
-          className="fixed bottom-24 right-5 z-30 w-72 card animate-pop-in"
+          className="fixed bottom-24 right-5 z-30 w-72 rounded-2xl border border-white/15 bg-slate-950 shadow-2xl ring-1 ring-yellow-300/20 animate-pop-in"
         >
-          <div className="card-body p-3">
+          <div className="p-3">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-xs uppercase tracking-widest text-slate-300 font-semibold">Calculadora</span>
-              <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-red-400 text-sm">✕</button>
+              <span className="text-xs uppercase tracking-widest text-slate-200 font-semibold">Calculadora</span>
+              <button onClick={() => setOpen(false)} className="text-slate-300 hover:text-red-400 text-sm">✕</button>
             </div>
             <div
-              className="bg-slate-950/80 border border-white/10 text-yellow-300 text-right text-2xl font-mono px-3 py-3 rounded-lg mb-2 truncate cursor-pointer select-all shadow-inner"
+              className="bg-black border border-yellow-300/30 text-yellow-300 text-right text-3xl font-mono font-bold px-3 py-4 rounded-lg mb-3 truncate cursor-pointer select-all shadow-inner"
               onClick={copyResult}
               title="Click para copiar"
             >
@@ -135,7 +135,7 @@ export default function Calculator() {
               <Btn onClick={inputDot}>.</Btn>
               <Btn onClick={equals} kind="eq">=</Btn>
             </div>
-            <p className="text-[10px] text-slate-400 mt-2 text-center">
+            <p className="text-[10px] text-slate-300 mt-2 text-center">
               Tip: usa el teclado · Enter para = · Esc para AC
             </p>
           </div>
@@ -157,16 +157,16 @@ function Btn({
   span?: 1 | 2;
 }) {
   const cls = {
-    num: "bg-white/10 hover:bg-white/20 text-white border border-white/10",
-    op: "bg-gradient-to-br from-yellow-300 to-amber-500 hover:brightness-110 text-brand-ink shadow-glow-yellow",
-    warn: "bg-gradient-to-br from-red-400 to-red-600 hover:brightness-110 text-white shadow-glow-red",
-    eq: "bg-gradient-to-br from-blue-400 to-blue-700 hover:brightness-110 text-white shadow-glow-blue",
+    num: "bg-slate-700 hover:bg-slate-600 active:bg-slate-500 text-white border border-slate-600",
+    op: "bg-gradient-to-br from-yellow-300 to-amber-500 hover:brightness-110 text-slate-900 shadow-glow-yellow font-bold",
+    warn: "bg-gradient-to-br from-red-400 to-red-600 hover:brightness-110 text-white shadow-glow-red font-bold",
+    eq: "bg-gradient-to-br from-blue-400 to-blue-700 hover:brightness-110 text-white shadow-glow-blue font-bold",
   }[kind];
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`${cls} ${span === 2 ? "col-span-2" : ""} h-10 rounded-lg text-sm font-semibold transition`}
+      className={`${cls} ${span === 2 ? "col-span-2" : ""} h-12 rounded-lg text-lg transition`}
     >
       {children}
     </button>
