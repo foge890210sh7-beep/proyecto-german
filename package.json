@@ -10,11 +10,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@google/genai": "^2.4.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.45.4",
+    "@types/jsonwebtoken": "^9.0.10",
     "exceljs": "^4.4.0",
     "iconv-lite": "^0.6.3",
-    "next": "^15.5.15",
+    "jsonwebtoken": "^9.0.3",
+    "next": "^16.2.4",
     "pdfkit": "^0.15.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5"
