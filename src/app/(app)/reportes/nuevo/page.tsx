@@ -98,6 +98,18 @@ export default function NuevoReporte() {
     setLineas(lineas.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
   }
 
+  // Un concepto es "precio abierto" cuando no tiene precio fijo en catalogo
+  // (precio_base = 0) y tampoco tiene override para este cliente.
+  // Ejemplo: "Señal vertical" — Germán mete el precio cada vez porque
+  // varia si lleva 1 o 2 postes IPR.
+  function esPrecioAbierto(conceptoId: string): boolean {
+    const c = conceptos.find((x) => x.id === conceptoId);
+    if (!c) return false;
+    const overrideCliente = preciosCliente[conceptoId];
+    if (overrideCliente !== undefined) return Number(overrideCliente) === 0;
+    return Number(c.precio_base) === 0;
+  }
+
   const total = useMemo(
     () => lineas.reduce((a, l) => a + Number(l.cantidad) * Number(l.precio_unitario), 0),
     [lineas],
@@ -127,6 +139,15 @@ export default function NuevoReporte() {
     if (!clienteId) return alert("Selecciona un cliente.");
     const conCantidad = lineas.filter((l) => Number(l.cantidad) > 0);
     if (conCantidad.length === 0) return alert("Pon la cantidad de al menos un daño antes de continuar.");
+    // Precio abierto sin precio → recordarle a Germán que lo escriba
+    const sinPrecio = conCantidad.filter(
+      (l) => esPrecioAbierto(l.concepto_id) && Number(l.precio_unitario) <= 0,
+    );
+    if (sinPrecio.length > 0) {
+      return alert(
+        `Pon el precio de: ${sinPrecio.map((l) => l.descripcion).join(", ")}`,
+      );
+    }
     setPaso(2);
     cargarFotos();
   }
@@ -370,13 +391,33 @@ export default function NuevoReporte() {
                 {lineas.map((l, i) => {
                   const importe = Number(l.cantidad) * Number(l.precio_unitario);
                   const activa = Number(l.cantidad) > 0;
+                  const abierto = esPrecioAbierto(l.concepto_id);
                   return (
                     <tr key={l.concepto_id} className={`border-t border-slate-200 ${activa ? "bg-yellow-50" : ""}`}>
                       <td className="px-4 py-2.5 align-middle">
                         <p className={`font-medium ${activa ? "text-slate-900" : "text-slate-700"}`}>{l.descripcion}</p>
-                        <p className="text-xs text-slate-500">
-                          {fmtMXN(l.precio_unitario)} / {l.unidad}
-                        </p>
+                        {abierto ? (
+                          <div className="mt-1 flex items-center gap-2">
+                            <span className="text-[10px] uppercase tracking-widest font-bold text-amber-700">Precio</span>
+                            <span className="text-slate-500 text-sm">$</span>
+                            <input
+                              type="number"
+                              inputMode="decimal"
+                              step="1"
+                              min="0"
+                              placeholder="0"
+                              className="w-24 rounded-md border border-amber-300 bg-white px-2 py-1 text-sm font-semibold text-slate-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                              value={l.precio_unitario === 0 ? "" : l.precio_unitario}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) => actualizar(i, { precio_unitario: e.target.value === "" ? 0 : Number(e.target.value) })}
+                            />
+                            <span className="text-xs text-slate-500">/ {l.unidad}</span>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-slate-500">
+                            {fmtMXN(l.precio_unitario)} / {l.unidad}
+                          </p>
+                        )}
                       </td>
                       <td className="px-3 py-2.5 align-middle text-center">
                         <input
@@ -411,17 +452,41 @@ export default function NuevoReporte() {
               {lineas.map((l, i) => {
                 const importe = Number(l.cantidad) * Number(l.precio_unitario);
                 const activa = Number(l.cantidad) > 0;
+                const abierto = esPrecioAbierto(l.concepto_id);
                 return (
                   <li key={l.concepto_id} className={`px-4 py-3 ${activa ? "bg-yellow-50" : ""}`}>
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="flex-1 min-w-0">
                         <p className={`text-[10px] uppercase tracking-widest font-bold ${activa ? "text-amber-700" : "text-slate-400"}`}>Daño</p>
                         <p className={`font-semibold leading-tight ${activa ? "text-slate-900" : "text-slate-700"}`}>{l.descripcion}</p>
-                        <p className="text-xs text-slate-500 mt-0.5">
-                          {fmtMXN(l.precio_unitario)} / {l.unidad}
-                        </p>
+                        {!abierto && (
+                          <p className="text-xs text-slate-500 mt-0.5">
+                            {fmtMXN(l.precio_unitario)} / {l.unidad}
+                          </p>
+                        )}
                       </div>
                     </div>
+                    {abierto && (
+                      <div className="mb-3">
+                        <p className="text-[10px] uppercase tracking-widest text-amber-700 font-bold mb-1">
+                          Precio por {l.unidad} (tú lo pones)
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <span className="text-slate-500 text-lg">$</span>
+                          <input
+                            type="number"
+                            inputMode="decimal"
+                            step="1"
+                            min="0"
+                            placeholder="0"
+                            className="w-full rounded-md border border-amber-300 bg-white px-3 py-2 text-lg font-semibold text-slate-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                            value={l.precio_unitario === 0 ? "" : l.precio_unitario}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => actualizar(i, { precio_unitario: e.target.value === "" ? 0 : Number(e.target.value) })}
+                          />
+                        </div>
+                      </div>
+                    )}
                     <div className="grid grid-cols-2 gap-3 items-end">
                       <div>
                         <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Cantidad</p>
