@@ -14,6 +14,22 @@ const ETAPA_LABEL: Record<Etapa, string> = {
 };
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    return await generarPDF(params);
+  } catch (err) {
+    // En vez de dejar que Vercel devuelva un 500 opaco, devolvemos el
+    // mensaje real del error como texto plano. Asi cuando German ve el
+    // error puede mandar screenshot y sabemos que arreglar.
+    console.error("[/api/reportes/[id]/pdf] error:", err);
+    const msg = (err as Error)?.stack || (err as Error)?.message || String(err);
+    return new NextResponse(
+      `Error generando PDF:\n\n${msg}\n\nMandale screenshot a Edgar.`,
+      { status: 500, headers: { "content-type": "text/plain; charset=utf-8" } },
+    );
+  }
+}
+
+async function generarPDF(params: Promise<{ id: string }>) {
   const { id } = await params;
   const supabase = await createClient();
   const [r, items, gastos, fotos] = await Promise.all([

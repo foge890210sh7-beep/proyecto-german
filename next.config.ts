@@ -6,10 +6,16 @@ const config: NextConfig = {
       { protocol: "https", hostname: "*.supabase.co" },
     ],
   },
-  // pdfkit/fontkit cargan archivos .afm/.ttf desde disco; hay que incluirlos
-  // explícitamente en el bundle de las Serverless Functions de Vercel.
+  // pdfkit y exceljs son librerias CJS que hacen require dinamico de archivos
+  // (fuentes AFM, workers). Si Next las empaqueta con webpack se rompen en
+  // Vercel serverless. Con serverExternalPackages las deja como CJS nativos.
+  serverExternalPackages: ["pdfkit", "fontkit", "exceljs"],
+  // Y ademas nos aseguramos que los .afm y .ttf viajen al bundle:
   outputFileTracingIncludes: {
-    "/api/reportes/**": ["./node_modules/pdfkit/**/*.afm"],
+    "/api/reportes/**": [
+      "./node_modules/pdfkit/**/*.afm",
+      "./node_modules/pdfkit/js/data/**",
+    ],
   },
 };
 
