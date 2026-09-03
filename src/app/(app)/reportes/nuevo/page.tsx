@@ -40,6 +40,14 @@ export default function NuevoReporte() {
   const [lineas, setLineas] = useState<Linea[]>([]);
   const [saving, setSaving] = useState(false);
 
+  // Alta rápida de concepto no listado (German lo pide para reportes ad-hoc)
+  const [mostrarNuevoConcepto, setMostrarNuevoConcepto] = useState(false);
+  const [ncDescripcion, setNcDescripcion] = useState("");
+  const [ncUnidad, setNcUnidad] = useState("pza");
+  const [ncPrecio, setNcPrecio] = useState<number>(0);
+  const [ncCantidad, setNcCantidad] = useState<number>(1);
+  const [ncGuardando, setNcGuardando] = useState(false);
+
   // Paso 2: fotos disponibles + selección
   const [fotosDisponibles, setFotosDisponibles] = useState<FotoConUrl[]>([]);
   const [seleccionadas, setSeleccionadas] = useState<Set<string>>(new Set());
@@ -96,6 +104,50 @@ export default function NuevoReporte() {
 
   function actualizar(i: number, patch: Partial<Linea>) {
     setLineas(lineas.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
+  }
+
+  async function agregarConceptoNuevo() {
+    const desc = ncDescripcion.trim();
+    if (!desc) return alert("Escribe la descripción del concepto.");
+    if (Number(ncPrecio) <= 0) return alert("Pon el precio.");
+    if (Number(ncCantidad) <= 0) return alert("Pon la cantidad.");
+    setNcGuardando(true);
+    // Insertamos el concepto en el catálogo (activo=true) para que quede
+    // disponible en futuros reportes también.
+    const { data, error } = await supabase
+      .from("conceptos")
+      .insert({
+        descripcion: desc,
+        unidad: ncUnidad || "pza",
+        precio_base: Number(ncPrecio),
+        activo: true,
+      })
+      .select()
+      .single();
+    if (error || !data) {
+      setNcGuardando(false);
+      return alert("No pude guardar el concepto: " + error?.message);
+    }
+    // Lo agregamos al catálogo local y a la hoja con la cantidad ya cargada
+    const nuevo = data as Concepto;
+    setConceptos((prev) => [...prev, nuevo]);
+    setLineas((prev) => [
+      ...prev,
+      {
+        concepto_id: nuevo.id,
+        descripcion: nuevo.descripcion,
+        unidad: nuevo.unidad,
+        cantidad: Number(ncCantidad),
+        precio_unitario: Number(ncPrecio),
+      },
+    ]);
+    // Reset del formulario
+    setNcDescripcion("");
+    setNcUnidad("pza");
+    setNcPrecio(0);
+    setNcCantidad(1);
+    setMostrarNuevoConcepto(false);
+    setNcGuardando(false);
   }
 
   // TODOS los precios son editables — Germán decide en cada reporte.
@@ -516,6 +568,93 @@ export default function NuevoReporte() {
               <span className="text-xl font-black text-yellow-300">{fmtMXN(total)}</span>
             </div>
           </>
+        )}
+      </div>
+
+      {/* Agregar concepto ad-hoc (no listado en el catálogo) */}
+      <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+        {!mostrarNuevoConcepto ? (
+          <button
+            type="button"
+            onClick={() => setMostrarNuevoConcepto(true)}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-amber-700 hover:bg-amber-50 rounded-xl transition"
+          >
+            <span className="text-lg">+</span> Agregar otro concepto no listado
+          </button>
+        ) : (
+          <div className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-bold text-slate-900">Nuevo concepto</p>
+              <button
+                type="button"
+                onClick={() => setMostrarNuevoConcepto(false)}
+                className="text-xs text-slate-500 hover:text-slate-800"
+              >
+                Cancelar
+              </button>
+            </div>
+            <p className="text-xs text-slate-500">
+              Se guarda en tu catálogo y también se agrega a este reporte.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="label">Descripción *</label>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="Ej. Rotulación de defensa"
+                  value={ncDescripcion}
+                  onChange={(e) => setNcDescripcion(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="label">Unidad</label>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="pza, m, m2..."
+                  value={ncUnidad}
+                  onChange={(e) => setNcUnidad(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="label">Precio $ *</label>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  step="0.01"
+                  min="0"
+                  className="input"
+                  placeholder="0.00"
+                  value={ncPrecio === 0 ? "" : ncPrecio}
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => setNcPrecio(e.target.value === "" ? 0 : Number(e.target.value))}
+                />
+              </div>
+              <div>
+                <label className="label">Cantidad *</label>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  step="0.01"
+                  min="0"
+                  className="input"
+                  placeholder="0"
+                  value={ncCantidad === 0 ? "" : ncCantidad}
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => setNcCantidad(e.target.value === "" ? 0 : Number(e.target.value))}
+                />
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={agregarConceptoNuevo}
+              disabled={ncGuardando}
+              className="btn-primary w-full md:w-auto"
+            >
+              {ncGuardando ? "Agregando…" : "✓ Agregar al reporte"}
+            </button>
+          </div>
         )}
       </div>
 

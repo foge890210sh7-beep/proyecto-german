@@ -105,8 +105,17 @@ async function generarPDF(params: Promise<{ id: string }>) {
   doc.moveDown(0.5);
   doc.moveTo(48, doc.y).lineTo(560, doc.y).strokeColor("#cbd5e1").stroke();
   doc.moveDown(0.5);
-  doc.fontSize(12).fillColor("#0f172a").text("Total a cobrar:", 378, doc.y, { width: 80, align: "right", continued: true });
-  doc.fillColor("#047857").text("  " + fmtMXN(rep.total), { align: "right" });
+  {
+    // German pidio que "Total a cobrar" y el numero queden en la misma
+    // linea (antes saltaban de renglon). Pintamos ambos en la misma Y con
+    // posiciones absolutas: el label a la izquierda del importe.
+    const totalY = doc.y;
+    doc.fontSize(12).fillColor("#0f172a")
+      .text("Total a cobrar:", 320, totalY, { width: 130, align: "right" });
+    doc.fillColor("#047857")
+      .text(fmtMXN(rep.total), 458, totalY, { width: 100, align: "right" });
+    doc.y = totalY + 18;
+  }
 
   // Gastos
   if ((gastos.data?.length ?? 0) > 0) {
