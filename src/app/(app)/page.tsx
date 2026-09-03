@@ -88,7 +88,7 @@ export default async function Dashboard() {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-4 stagger">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 stagger">
         <Link href="/reportes/nuevo" className="card group">
           <div className="card-body">
             <p className="text-3xl group-hover:scale-110 transition-transform inline-block">📋</p>
@@ -108,6 +108,13 @@ export default async function Dashboard() {
             <p className="text-3xl group-hover:scale-110 transition-transform inline-block">📸</p>
             <p className="font-bold mt-2 text-white">Subir fotos</p>
             <p className="text-sm text-slate-300">Antes, durante y después del trabajo.</p>
+          </div>
+        </Link>
+        <Link href="/notas" className="card group">
+          <div className="card-body">
+            <p className="text-3xl group-hover:scale-110 transition-transform inline-block">📓</p>
+            <p className="font-bold mt-2 text-white">Mi cuaderno</p>
+            <p className="text-sm text-slate-300">Hoja de libreta para escribir a mano notas y estimaciones sueltas.</p>
           </div>
         </Link>
       </div>

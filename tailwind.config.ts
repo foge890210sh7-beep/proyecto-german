@@ -4,6 +4,10 @@ export default {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        // Fuente handwriting para la hoja de cuaderno (/notas)
+        hand: ["var(--font-hand)", "cursive"],
+      },
       colors: {
         brand: {
           DEFAULT: "#facc15",   // amarillo vivo

@@ -11,6 +11,7 @@ const links = [
   { href: "/gastos", label: "Gastos" },
   { href: "/presupuestos", label: "Presupuesto" },
   { href: "/fotos", label: "Fotos" },
+  { href: "/notas", label: "Notas" },
   { href: "/disenos", label: "Diseños IA" },
   { href: "/conceptos", label: "Conceptos" },
   { href: "/clientes", label: "Clientes" },

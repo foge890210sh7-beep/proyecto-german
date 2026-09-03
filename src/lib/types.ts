@@ -53,6 +53,16 @@ export type ReporteItem = {
   importe: number;
 };
 
+export type Nota = {
+  id: string;
+  titulo: string | null;
+  contenido: string;
+  tramo_id: string | null;
+  fecha: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Gasto = {
   id: string;
   fecha: string;
