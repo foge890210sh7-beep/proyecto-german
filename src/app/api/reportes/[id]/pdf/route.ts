@@ -75,14 +75,20 @@ async function generarPDF(params: Promise<{ id: string }>) {
   ];
 
   doc.fontSize(10).fillColor("#475569");
-  cols.forEach((c, i) =>
-    doc.text(c.label, c.x, doc.y, {
-      width: c.w,
-      align: (c as any).align ?? "left",
-      continued: i !== cols.length - 1,
-    }),
-  );
-  doc.moveDown(0.3);
+  {
+    // Pintamos cada label en su columna. Sin `continued` porque combinar
+    // continued+align=right rompe el layout cuando hay menos columnas.
+    const headerY = doc.y;
+    cols.forEach((c) =>
+      doc.text(c.label, c.x, headerY, {
+        width: c.w,
+        align: (c as any).align ?? "left",
+      }),
+    );
+    // moveDown desde la ultima linea pintada (moveDown despues de text con
+    // absolute positioning no siempre respeta la Y del header)
+    doc.y = headerY + 14;
+  }
   doc.moveTo(48, doc.y).lineTo(560, doc.y).strokeColor("#cbd5e1").stroke();
   doc.moveDown(0.3);
 
