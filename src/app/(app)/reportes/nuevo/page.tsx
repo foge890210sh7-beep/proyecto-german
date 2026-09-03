@@ -98,16 +98,12 @@ export default function NuevoReporte() {
     setLineas(lineas.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
   }
 
-  // Un concepto es "precio abierto" cuando no tiene precio fijo en catalogo
-  // (precio_base = 0) y tampoco tiene override para este cliente.
-  // Ejemplo: "Señal vertical" — Germán mete el precio cada vez porque
-  // varia si lleva 1 o 2 postes IPR.
-  function esPrecioAbierto(conceptoId: string): boolean {
-    const c = conceptos.find((x) => x.id === conceptoId);
-    if (!c) return false;
-    const overrideCliente = preciosCliente[conceptoId];
-    if (overrideCliente !== undefined) return Number(overrideCliente) === 0;
-    return Number(c.precio_base) === 0;
+  // TODOS los precios son editables — Germán decide en cada reporte.
+  // El catalogo solo sugiere un precio default, pero cualquiera se puede
+  // modificar (ej. Ménsula $19 default → $12 en este reporte especifico).
+  // Mantenemos la funcion para no regar cambios por toda la UI.
+  function esPrecioAbierto(_conceptoId: string): boolean {
+    return true;
   }
 
   const total = useMemo(
@@ -139,9 +135,9 @@ export default function NuevoReporte() {
     if (!clienteId) return alert("Selecciona un cliente.");
     const conCantidad = lineas.filter((l) => Number(l.cantidad) > 0);
     if (conCantidad.length === 0) return alert("Pon la cantidad de al menos un daño antes de continuar.");
-    // Precio abierto sin precio → recordarle a Germán que lo escriba
+    // Si activó cantidad pero dejó precio en 0, avisar
     const sinPrecio = conCantidad.filter(
-      (l) => esPrecioAbierto(l.concepto_id) && Number(l.precio_unitario) <= 0,
+      (l) => Number(l.precio_unitario) <= 0,
     );
     if (sinPrecio.length > 0) {
       return alert(
@@ -469,7 +465,7 @@ export default function NuevoReporte() {
                     {abierto && (
                       <div className="mb-3">
                         <p className="text-[10px] uppercase tracking-widest text-amber-700 font-bold mb-1">
-                          Precio por {l.unidad} (tú lo pones)
+                          Precio por {l.unidad}
                         </p>
                         <div className="flex items-center gap-2">
                           <span className="text-slate-500 text-lg">$</span>
