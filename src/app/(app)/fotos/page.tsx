@@ -24,7 +24,15 @@ export default function FotosPage() {
   const [tramoActivo, setTramoActivo] = useState<string>("");
   const [fechaActiva, setFechaActiva] = useState(hoyISO());
   const [uploading, setUploading] = useState(false);
-  const inputRefs = {
+  // Dos inputs por etapa: uno abre la CAMARA directo (capture=environment),
+  // otro abre la GALERIA para elegir/editar fotos ya tomadas (recortar,
+  // rotar, marcar en el propio celular antes de subirlas).
+  const camRefs = {
+    antes: useRef<HTMLInputElement>(null),
+    durante: useRef<HTMLInputElement>(null),
+    despues: useRef<HTMLInputElement>(null),
+  };
+  const galRefs = {
     antes: useRef<HTMLInputElement>(null),
     durante: useRef<HTMLInputElement>(null),
     despues: useRef<HTMLInputElement>(null),
@@ -132,8 +140,9 @@ export default function FotosPage() {
                 <button
                   type="button"
                   disabled={uploading}
-                  onClick={() => inputRefs[e.value].current?.click()}
+                  onClick={() => camRefs[e.value].current?.click()}
                   className={`text-white rounded-xl p-6 text-center transition shadow-sm ${e.btn} disabled:opacity-50`}
+                  title="Abrir cámara del celular"
                 >
                   <div className="text-4xl mb-1">{e.emoji}</div>
                   <div className="font-semibold text-lg">{e.label}</div>
@@ -141,12 +150,32 @@ export default function FotosPage() {
                     {(conteoHoy[e.value] ?? 0)} foto(s) hoy
                   </div>
                 </button>
+                <button
+                  type="button"
+                  disabled={uploading}
+                  onClick={() => galRefs[e.value].current?.click()}
+                  className="btn-secondary w-full text-sm"
+                  title="Elegir de galería (permite editar / recortar / rotar antes de subir)"
+                >
+                  🖼️ Subir de galería
+                </button>
                 <input
-                  ref={inputRefs[e.value]}
+                  ref={camRefs[e.value]}
                   type="file"
                   accept="image/*"
                   multiple
                   capture="environment"
+                  className="hidden"
+                  onChange={(ev) => {
+                    tomar(e.value, ev.target.files);
+                    ev.target.value = "";
+                  }}
+                />
+                <input
+                  ref={galRefs[e.value]}
+                  type="file"
+                  accept="image/*"
+                  multiple
                   className="hidden"
                   onChange={(ev) => {
                     tomar(e.value, ev.target.files);
@@ -159,7 +188,7 @@ export default function FotosPage() {
 
           {uploading && <p className="text-sm text-amber-600 mt-3 text-center">⏳ Subiendo fotos…</p>}
           <p className="text-xs text-slate-500 mt-3">
-            Tip: en celular, el botón abre directo la cámara. En compu, abre el explorador para subir.
+            <strong>Tomar foto</strong>: abre la cámara del celular. <strong>Subir de galería</strong>: elige de fotos ya tomadas (te deja editarlas/recortarlas primero en tu galería).
           </p>
         </div>
       </div>
