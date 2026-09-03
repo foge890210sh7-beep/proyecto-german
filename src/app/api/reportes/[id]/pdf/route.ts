@@ -50,10 +50,9 @@ async function generarPDF(params: Promise<{ id: string }>) {
   doc.on("data", (b) => buffers.push(b));
   const done = new Promise<Buffer>((res) => doc.on("end", () => res(Buffer.concat(buffers))));
 
-  // Header
-  doc.fontSize(18).fillColor("#b45309").text("Reporte de trabajo", { align: "left" });
-  doc.fontSize(10).fillColor("#475569").text("Administración Saladino — Reparación de autopistas");
-  doc.moveDown();
+  // German pidio quitar el header "Reporte de trabajo" y
+  // "Administracion Saladino — Reparacion de autopistas" del PDF.
+  // El PDF empieza directo con la fecha/cliente/tramo.
 
   // Datos generales
   doc.fillColor("#0f172a").fontSize(11);
@@ -65,12 +64,13 @@ async function generarPDF(params: Promise<{ id: string }>) {
   if (rep.notas) doc.text(`Notas: ${rep.notas}`);
   doc.moveDown();
 
-  // Tabla
+  // Tabla — German pidio quitar la columna "P. unit" (precio unitario).
+  // Solo dejamos Concepto, Unidad, Cantidad e Importe total.
+  // Redistribuimos el ancho aprovechando el espacio de la columna eliminada.
   const cols = [
-    { x: 48, w: 220, label: "Concepto" },
-    { x: 268, w: 50, label: "Unidad" },
-    { x: 318, w: 60, label: "Cantidad", align: "right" as const },
-    { x: 378, w: 80, label: "P. unit", align: "right" as const },
+    { x: 48, w: 280, label: "Concepto" },
+    { x: 328, w: 60, label: "Unidad" },
+    { x: 388, w: 70, label: "Cantidad", align: "right" as const },
     { x: 458, w: 100, label: "Importe", align: "right" as const },
   ];
 
@@ -92,8 +92,7 @@ async function generarPDF(params: Promise<{ id: string }>) {
     doc.text(it.descripcion, cols[0].x, y, { width: cols[0].w });
     doc.text(it.unidad, cols[1].x, y, { width: cols[1].w });
     doc.text(String(Number(it.cantidad)), cols[2].x, y, { width: cols[2].w, align: "right" });
-    doc.text(fmtMXN(it.precio_unitario), cols[3].x, y, { width: cols[3].w, align: "right" });
-    doc.text(fmtMXN(it.importe), cols[4].x, y, { width: cols[4].w, align: "right" });
+    doc.text(fmtMXN(it.importe), cols[3].x, y, { width: cols[3].w, align: "right" });
     doc.moveDown(0.5);
   });
 
