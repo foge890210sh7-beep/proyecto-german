@@ -6,6 +6,11 @@ dist
 .env.local
 .env.*.local
 .env.reactivar
+.env.production
+
+# Tesseract trainedData cacheado localmente (15MB)
+spa.traineddata
+*.traineddata
 *.log
 .DS_Store
 .vercel
@@ -13,3 +18,5 @@ next-env.d.ts
 *.tsbuildinfo
 
 .vercel
+
+.env*.local

@@ -89,6 +89,13 @@ export default async function Dashboard() {
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 stagger">
+        <Link href="/ordenes/cargar-pdf" className="card group ring-1 ring-amber-300/40">
+          <div className="card-body">
+            <p className="text-3xl group-hover:scale-110 transition-transform inline-block">📄⬆️</p>
+            <p className="font-bold mt-2 text-white">Cargar PDF de orden</p>
+            <p className="text-sm text-slate-300">Sube el dictamen y la app lo lee solo. Tú solo revisas y guardas.</p>
+          </div>
+        </Link>
         <Link href="/reportes/nuevo" className="card group">
           <div className="card-body">
             <p className="text-3xl group-hover:scale-110 transition-transform inline-block">📋</p>
