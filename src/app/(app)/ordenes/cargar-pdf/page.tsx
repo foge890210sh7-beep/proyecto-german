@@ -102,7 +102,12 @@ export default function CargarPdfPage() {
       setProgreso("");
     } catch (e: any) {
       console.error(e);
-      setError(e?.message || "Error procesando el PDF");
+      const pdfDanado = e?.name === "InvalidPDFException" || /Invalid PDF|PDF structure/i.test(e?.message ?? "");
+      setError(
+        pdfDanado
+          ? "Ese archivo no se pudo abrir. Revisa que sea el PDF de la orden y que no esté dañado."
+          : "No se pudo leer el PDF. Intenta otra vez; si sigue fallando, mándale captura a Edgar.",
+      );
       setFase("listo");
       setProgreso("");
     }

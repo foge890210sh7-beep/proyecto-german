@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { fmtFecha, fmtMXN } from "@/lib/format";
 import DeleteReporteButton from "./DeleteReporteButton";
+import CompartirPdf from "./CompartirPdf";
 import FotosManager from "./FotosManager";
 import Calculator from "@/components/Calculator";
 import type { Etapa, Foto } from "@/lib/types";
@@ -48,6 +49,9 @@ export default async function ReporteDetalle({ params }: { params: Promise<{ id:
       url: supabase.storage.from("fotos").getPublicUrl(f.storage_path).data.publicUrl,
     }));
 
+  const dictamen = String(rep.notas ?? "").match(/Dictamen:\s*(\S+)/)?.[1];
+  const nombreArchivo = `${dictamen ? `Dictamen-${dictamen}` : "Reporte"}-${rep.fecha}.pdf`;
+
   const fotosEnReporte = conUrl(fotosReporte.data as Foto[]);
   const fotosCandidatas = conUrl(fotosSueltas as Foto[]);
 
@@ -62,11 +66,20 @@ export default async function ReporteDetalle({ params }: { params: Promise<{ id:
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <a href={`/api/reportes/${id}/pdf`} target="_blank" rel="noreferrer" className="btn-secondary">📄 PDF</a>
+          <a href={`/api/reportes/${id}/pdf`} target="_blank" rel="noreferrer" className="btn-secondary">📄 Ver PDF</a>
           <a href={`/api/reportes/${id}/excel`} className="btn-secondary">📊 Excel</a>
           <DeleteReporteButton id={id} />
         </div>
       </div>
+
+      <div className="card">
+        <div className="card-body flex items-baseline justify-between gap-3">
+          <p className="text-sm font-bold uppercase tracking-widest text-slate-300">Total a cobrar</p>
+          <p className="text-3xl font-black text-yellow-300">{fmtMXN(rep.total)}</p>
+        </div>
+      </div>
+
+      <CompartirPdf id={id} nombreArchivo={nombreArchivo} />
 
       <div className="card">
         <div className="card-body">
@@ -88,16 +101,16 @@ export default async function ReporteDetalle({ params }: { params: Promise<{ id:
                     <td className="text-right font-medium">{fmtMXN(it.importe)}</td>
                   </tr>
                 ))}
-                <tr className="bg-amber-50">
-                  <td colSpan={4} className="text-right font-semibold">Total a cobrar</td>
-                  <td className="text-right font-bold text-lg text-emerald-700">{fmtMXN(rep.total)}</td>
+                <tr className="bg-amber-400/10">
+                  <td colSpan={4} className="text-right font-semibold text-white">Total a cobrar</td>
+                  <td className="text-right font-bold text-lg text-yellow-300">{fmtMXN(rep.total)}</td>
                 </tr>
               </tbody>
             </table>
           )}
           {rep.notas && (
-            <div className="mt-4 text-sm text-slate-600">
-              <span className="font-medium">Notas: </span>{rep.notas}
+            <div className="mt-4 text-sm text-slate-300 whitespace-pre-line">
+              <span className="font-medium text-white">Notas: </span>{rep.notas}
             </div>
           )}
         </div>

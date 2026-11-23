@@ -194,16 +194,29 @@ export function parseDictamen(texto: string): DictamenExtraido {
   const mBloqueDanos = t.match(/Descripci[oó]n\s+Cant\.?\s+U\.?M\.?([\s\S]+?)(?=VEH[IÍ]CULOS?\s+INVOLUCRADOS|CAUSAS|COMENTARIOS|$)/i);
   if (mBloqueDanos) {
     const lineas = mBloqueDanos[1].split(/\n/).map((l) => l.trim()).filter(Boolean);
+    // Descripciones largas a veces llegan partidas en dos renglones: el primero
+    // sin cantidad y el segundo con "... 2 PZA". Se juntan.
+    // El OCR confunde dígitos con letras parecidas (Z→2, O→0, I/l→1, S→5, B→8).
+    const OCR_DIGITO: Record<string, string> = { Z: "2", z: "2", O: "0", o: "0", I: "1", l: "1", S: "5", B: "8" };
+    const cantidadOcr = (s: string) => parseNumero(s.replace(/[ZzOoIlSB]/g, (c) => OCR_DIGITO[c]));
+    let pendiente = "";
     for (const linea of lineas) {
-      const mL = linea.match(/^(.+?)\s+(\d+(?:\.\d+)?)\s+(PZA|M|M2|M3|ML|LT|KG|TON|JORNADA|DIA)$/i);
-      if (mL) {
+      const mL = linea.match(/^(.*?)\s*\b([\dZzOoIlSB]{1,4}(?:\.\d+)?)\s+(PZA|M|M2|M3|ML|LT|KG|TON|JORNADA|DIA)$/i);
+      if (mL && /\d/.test(mL[2].replace(/[ZzOoIlSB]/g, (c) => OCR_DIGITO[c]))) {
+        const descripcion = `${pendiente} ${mL[1]}`.replace(/\s+/g, " ").trim();
+        pendiente = "";
+        if (!descripcion) continue;
         out.danos.push({
-          descripcion: mL[1].trim(),
-          cantidad: parseNumero(mL[2]),
+          descripcion,
+          cantidad: cantidadOcr(mL[2]),
           unidad: mL[3].toLowerCase(),
           precio_unitario: null,
           importe: null,
         });
+      } else if (/[a-záéíóúñ]{3,}/i.test(linea) && linea.length >= 10) {
+        pendiente = linea;
+      } else {
+        pendiente = "";
       }
     }
   }
