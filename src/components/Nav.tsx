@@ -55,9 +55,13 @@ export default function Nav() {
     <header className="sticky top-0 z-30 backdrop-blur-xl bg-slate-950/60 border-b border-white/10 shadow-[0_8px_24px_-12px_rgba(37,99,235,.45)]">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
         <Link href="/" className="group flex items-center gap-2 font-extrabold text-lg tracking-tight">
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand via-brand-red to-brand-blue text-brand-ink font-black shadow-glow-yellow group-hover:animate-pulse-ring transition">
-            S
-          </span>
+          <img
+            src="/logo.webp"
+            alt=""
+            width={40}
+            height={40}
+            className="h-10 w-10 group-hover:scale-105 transition-transform"
+          />
           <span className="logo-shine hidden sm:inline">Administración Saladino</span>
           <span className="logo-shine sm:hidden">A. Saladino</span>
         </Link>

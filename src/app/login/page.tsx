@@ -35,15 +35,17 @@ export default function LoginPage() {
 
       <div className="w-full max-w-sm card animate-pop-in">
         <div className="card-body">
-          <div className="flex items-center gap-3 mb-1">
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-300 via-red-500 to-blue-600 text-brand-ink font-black text-lg shadow-glow-yellow animate-pulse-ring">
-              S
-            </span>
-            <h1 className="text-xl font-black tracking-tight logo-shine">
-              Administración Saladino
-            </h1>
-          </div>
-          <p className="text-sm text-slate-300 mb-6">Acceso privado · Reparación de autopistas</p>
+          <img
+            src="/logo.webp"
+            alt="Logo de Administración Saladino"
+            width={160}
+            height={160}
+            className="mx-auto h-40 w-40 mb-2 drop-shadow-[0_8px_24px_rgba(250,204,21,.35)]"
+          />
+          <h1 className="text-xl font-black tracking-tight logo-shine text-center mb-1">
+            Administración Saladino
+          </h1>
+          <p className="text-sm text-slate-300 mb-6 text-center">Acceso privado · Reparación de autopistas</p>
           <form onSubmit={submit} className="space-y-4">
             <div>
               <label className="label">Correo</label>

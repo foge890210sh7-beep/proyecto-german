@@ -108,5 +108,7 @@ function redirigirAMantenimiento(url: URL, motivo: string) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  // Archivos de la PWA (manifest, sw.js, íconos, worker de PDF) deben ser
+  // públicos: el navegador los pide sin sesión para poder instalar la app.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|mjs)$).*)"],
 };

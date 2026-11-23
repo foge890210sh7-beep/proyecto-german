@@ -79,6 +79,11 @@ export default function CargarPdfPage() {
         const dataUrl = canvas.toDataURL("image/png");
         const { data } = await worker.recognize(dataUrl);
         textoTotal += `\n===== PAGE ${i} =====\n` + data.text;
+
+        // Lo que sigue al dictamen son fotos y bitácora: no hace falta leerlo.
+        const tieneTotal = /asciende\s+a\s+la\s+cantidad/i.test(textoTotal);
+        const tieneDanos = /Descripci[oó]n\s+Cant|DA[ÑN]OS\s+AL\s+CAMINO:/i.test(textoTotal);
+        if (tieneTotal && tieneDanos) break;
       }
 
       await worker.terminate();
@@ -448,9 +453,10 @@ function FormRevisar(props: {
           <h2 className="font-bold text-white text-lg mb-3">Daños ({datos.danos.length})</h2>
           <div className="space-y-2">
             {datos.danos.map((d, i) => (
-              <div key={i} className="flex gap-2 items-center">
+              <div key={i} className="flex flex-wrap sm:flex-nowrap gap-2 items-center rounded-lg border border-white/10 p-2 sm:border-0 sm:p-0">
                 <input
                   type="number"
+                  aria-label={`Cantidad del daño ${i + 1}`}
                   value={d.cantidad ?? 0}
                   onChange={(e) => {
                     const nuevas = [...datos.danos];
@@ -461,6 +467,7 @@ function FormRevisar(props: {
                 />
                 <input
                   type="text"
+                  aria-label={`Unidad del daño ${i + 1}`}
                   value={d.unidad}
                   onChange={(e) => {
                     const nuevas = [...datos.danos];
@@ -471,21 +478,23 @@ function FormRevisar(props: {
                 />
                 <input
                   type="text"
+                  aria-label={`Descripción del daño ${i + 1}`}
                   value={d.descripcion}
                   onChange={(e) => {
                     const nuevas = [...datos.danos];
                     nuevas[i] = { ...d, descripcion: e.target.value };
                     setDatos({ ...datos, danos: nuevas });
                   }}
-                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white outline-none"
+                  className="order-first sm:order-none basis-full sm:basis-auto flex-1 min-w-0 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white outline-none"
                 />
                 <button
+                  type="button"
                   onClick={() => {
                     const nuevas = datos.danos.filter((_, j) => j !== i);
                     setDatos({ ...datos, danos: nuevas });
                   }}
-                  className="text-red-400 hover:text-red-300 px-2"
-                  aria-label="Borrar daño"
+                  className="ml-auto sm:ml-0 text-red-400 hover:text-red-300 px-2 py-2"
+                  aria-label={`Borrar daño ${i + 1}`}
                 >
                   🗑️
                 </button>

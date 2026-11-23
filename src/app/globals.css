@@ -97,6 +97,11 @@ body {
   .card-body { @apply p-5; }
 
   .table { @apply w-full text-sm text-slate-100; }
+  /* En celular la tabla se desplaza de lado en vez de ensanchar toda la página */
+  @media (max-width: 767px) {
+    /* table.table: más específico que la utilidad `table` de Tailwind (display: table) */
+    table.table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  }
   .table th {
     @apply text-left text-[11px] font-bold text-slate-300 uppercase tracking-widest px-3 py-2.5 border-b border-white/10;
   }
